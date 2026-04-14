@@ -3,160 +3,156 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Royal Puzzle Fix</title>
+    <title>Royal Block Puzzle</title>
     <script defer src="https://pl28980106.profitablecpmratenetwork.com/20/bd/f4/20bdf4fc49430a4adf6663e28963e137.js"></script>
     <style>
         :root { --wood: #8d6e63; --grid-bg: #3e2723; --accent: #feca57; --bg: #2d1b17; }
-        
-        /* Poori screen ko control karne ke liye */
         html, body { height: 100%; margin: 0; padding: 0; background: var(--bg); color: white; font-family: sans-serif; overflow: hidden; }
         
-        #game-wrapper { 
-            display: flex; 
-            flex-direction: column; 
-            height: 100vh; 
-            width: 100%; 
-            max-width: 450px; 
-            margin: 0 auto;
-        }
+        /* Screens */
+        .screen { position: fixed; inset: 0; display: none; flex-direction: column; align-items: center; justify-content: center; background: var(--bg); z-index: 20; }
+        .active { display: flex; }
 
-        /* Ad Sections */
+        #intro-screen { background: radial-gradient(circle, #4e342e, #1a1a1a); z-index: 100; }
+        .logo-anim { font-size: 3rem; font-weight: bold; color: var(--accent); animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
+
+        /* Level Grid */
+        .level-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; padding: 20px; }
+        .lvl-node { width: 55px; height: 55px; background: #000; border: 2px solid #444; display: flex; align-items: center; justify-content: center; border-radius: 10px; cursor: pointer; }
+        .lvl-unlocked { border-color: var(--accent); color: var(--accent); font-weight: bold; }
+
+        /* Game Layout */
+        #game-wrapper { display: flex; flex-direction: column; height: 100vh; width: 100%; max-width: 450px; margin: 0 auto; }
         .ad-zone { width: 100%; height: 60px; display: flex; align-items: center; justify-content: center; background: #000; flex-shrink: 0; }
-
-        /* Main Game Area */
-        #main-content { 
-            flex-grow: 1; 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            justify-content: center; 
-            padding: 10px;
-        }
+        #main-content { flex-grow: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 10px; }
 
         #hud { display: flex; gap: 15px; margin-bottom: 10px; }
         .stat-box { background: #000; border: 1.5px solid var(--accent); border-radius: 8px; padding: 5px 12px; text-align: center; }
         .val { font-size: 1.1rem; font-weight: bold; color: var(--accent); display: block; }
-        .lbl { font-size: 10px; text-transform: uppercase; }
 
-        #grid { 
-            display: grid; 
-            grid-template-columns: repeat(8, 1fr); 
-            gap: 4px; 
-            background: var(--grid-bg); 
-            padding: 8px; 
-            border-radius: 10px; 
-            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
-        }
+        #grid { display: grid; grid-template-columns: repeat(8, 1fr); gap: 4px; background: var(--grid-bg); padding: 8px; border-radius: 10px; }
         .cell { width: 40px; height: 40px; background: rgba(255,255,255,0.05); border-radius: 4px; }
-        .cell.filled { background: var(--wood); border: 1px solid #a1887f; box-shadow: inset 0 0 5px #000; }
+        .cell.filled { background: var(--wood); border: 1px solid #a1887f; }
 
-        #pieces-area { margin-top: 20px; display: flex; gap: 10px; height: 70px; }
+        #pieces-area { margin-top: 20px; display: flex; gap: 10px; height: 75px; }
         .piece-container { padding: 5px; border: 2px solid transparent; border-radius: 8px; background: rgba(255,255,255,0.03); cursor: pointer; }
         .piece-container.selected { border-color: var(--accent); background: rgba(254, 202, 87, 0.2); }
         .piece { display: grid; gap: 2px; }
         .p-block { width: 15px; height: 15px; background: var(--wood); border-radius: 2px; }
 
-        #hint-btn { margin-top: 15px; background: var(--accent); color: #000; border: none; padding: 10px 20px; border-radius: 20px; font-weight: bold; cursor: pointer; }
-        #hint-msg { height: 20px; color: var(--accent); font-size: 13px; font-weight: bold; }
-
-        .hint-active .cell.filled { animation: shake 0.5s infinite; border-color: #fff; }
-        @keyframes shake { 0%, 100% { transform: scale(1); } 50% { transform: scale(0.95); } }
+        .btn { background: var(--accent); color: #000; border: none; padding: 10px 25px; border-radius: 20px; font-weight: bold; cursor: pointer; }
+        .btn:disabled { background: #555; cursor: not-allowed; opacity: 0.7; }
+        
+        /* Sidebar Ad for Desktop */
+        @media (min-width: 800px) {
+            .side-ad { position: fixed; right: 20px; top: 50%; transform: translateY(-50%); width: 160px; }
+        }
     </style>
 </head>
-<body onload="init()">
+<body onload="initApp()">
 
-<div id="game-wrapper">
-    <div class="ad-zone">
-        <script type="text/javascript">
-            atOptions = { 'key' : 'e554307db5af71bb93a1bdbca30869f3', 'format' : 'iframe', 'height' : 50, 'width' : 320, 'params' : {} };
-        </script>
-        <script type="text/javascript" src="https://www.highperformanceformat.com/e554307db5af71bb93a1bdbca30869f3/invoke.js"></script>
+    <div id="intro-screen" class="screen active">
+        <div class="logo-anim">ROYAL BLOCKS</div>
     </div>
 
-    <div id="main-content">
-        <div id="hud">
-            <div class="stat-box"><span class="lbl">Level</span><span id="ui-lvl" class="val">1</span></div>
-            <div class="stat-box"><span class="lbl">Score</span><span id="ui-score" class="val">0</span></div>
-            <div class="stat-box"><span class="lbl">Target</span><span id="ui-target" class="val">300</span></div>
+    <div id="start-screen" class="screen">
+        <h1 style="color:var(--accent)">PUZZLE KING</h1>
+        <button class="btn" onclick="showScreen('level-screen')">START GAME</button>
+    </div>
+
+    <div id="level-screen" class="screen">
+        <h3>CHOOSE LEVEL</h3>
+        <div class="level-grid" id="level-list"></div>
+        <button class="btn" style="font-size: 11px;" onclick="showScreen('start-screen')">BACK</button>
+    </div>
+
+    <div id="game-screen" class="screen">
+        <div id="game-wrapper">
+            <div class="ad-zone">
+                <script type="text/javascript">
+                    atOptions = { 'key' : 'e554307db5af71bb93a1bdbca30869f3', 'format' : 'iframe', 'height' : 50, 'width' : 320, 'params' : {} };
+                </script>
+                <script src="https://www.highperformanceformat.com/e554307db5af71bb93a1bdbca30869f3/invoke.js"></script>
+            </div>
+
+            <div id="main-content">
+                <div id="hud">
+                    <div class="stat-box"><span id="ui-lvl" class="val">1</span></div>
+                    <div class="stat-box"><span id="ui-score" class="val">0</span></div>
+                    <div class="stat-box"><span id="ui-target" class="val">300</span></div>
+                </div>
+                <div id="hint-msg" style="height:20px; color:var(--accent); font-size:12px;"></div>
+                <div id="grid"></div>
+                <div id="pieces-area"></div>
+                <button id="hint-btn" class="btn" onclick="useMagicHint()" disabled style="margin-top:15px;">✨ MAGIC HINT</button>
+                <div id="cooldown-txt" style="font-size:10px; color:#ff7675; margin-top:5px;"></div>
+            </div>
         </div>
-
-        <div id="hint-msg"></div>
-        <div id="grid"></div>
-        <div id="pieces-area"></div>
-
-        <button id="hint-btn" onclick="useHint()">✨ MAGIC HINT</button>
     </div>
-
-    <div class="ad-zone">
-        <script type="text/javascript">
-            atOptions = { 'key' : 'e554307db5af71bb93a1bdbca30869f3', 'format' : 'iframe', 'height' : 50, 'width' : 320, 'params' : {} };
-        </script>
-        <script type="text/javascript" src="https://www.highperformanceformat.com/e554307db5af71bb93a1bdbca30869f3/invoke.js"></script>
-    </div>
-</div>
 
 <script>
+    const smartLinks = [
+        "https://www.profitablecpmratenetwork.com/kcyc4amqi?key=24503b450eb58c41a82c4231af9397cd",
+        "https://www.profitablecpmratenetwork.com/qecjct8m22?key=cef678279c117147566d216538aa0f75",
+        "https://www.profitablecpmratenetwork.com/f0jdkwrit7?key=6ed3c1cf6d789ffdb030da4af56ab420"
+    ];
+
+    let unlocked = parseInt(localStorage.getItem('royal_unlocked')) || 1;
     let board = Array(8).fill().map(() => Array(8).fill(0));
-    let selectedPiece = null;
-    let score = 0;
-    let isHintMode = false;
-    let currentLvl = parseInt(localStorage.getItem('royal_lvl')) || 1;
-    let target = 300 + (currentLvl - 1) * 200;
+    let score = 0, moves = 0, currentLvl = 1, target = 300;
+    let selectedPiece = null, isHintMode = false, cooldown = false;
     const shapes = [[[1,1],[1,1]], [[1,1,1]], [[1,1,1,1]], [[1,1],[1,0]], [[1]], [[1,1,1],[0,1,0]]];
 
-    function init() {
-        document.getElementById('ui-lvl').innerText = currentLvl;
+    function initApp() {
+        setTimeout(() => showScreen('start-screen'), 2500);
+    }
+
+    function showScreen(id) {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+        if(id === 'level-screen') renderLevels();
+    }
+
+    function renderLevels() {
+        const list = document.getElementById('level-list');
+        list.innerHTML = '';
+        for(let i=1; i<=20; i++) {
+            const div = document.createElement('div');
+            div.className = `lvl-node ${i <= unlocked ? 'lvl-unlocked' : ''}`;
+            div.innerText = i;
+            if(i <= unlocked) div.onclick = () => startLevel(i);
+            list.appendChild(div);
+        }
+    }
+
+    function startLevel(lvl) {
+        currentLvl = lvl;
+        target = 300 + (lvl - 1) * 200;
+        score = 0; moves = 0;
+        document.getElementById('ui-lvl').innerText = lvl;
         document.getElementById('ui-target').innerText = target;
-        const grid = document.getElementById('grid');
+        document.getElementById('ui-score').innerText = "0";
+        board = Array(8).fill().map(() => Array(8).fill(0));
+        
+        const gridEl = document.getElementById('grid');
+        gridEl.innerHTML = '';
         for(let r=0; r<8; r++) {
             for(let c=0; c<8; c++) {
                 const cell = document.createElement('div');
                 cell.className = 'cell';
                 cell.id = `r${r}c${c}`;
                 cell.onclick = () => handleMove(r, c);
-                grid.appendChild(cell);
+                gridEl.appendChild(cell);
             }
         }
         spawn();
-    }
-
-    function useHint() {
-        window.open("https://www.profitablecpmratenetwork.com/bm6t0hv6n?key=aa011a75a61b6cd284d3a64a702daf09", "_blank", "width=300,height=400");
-        isHintMode = true;
-        document.getElementById('grid').classList.add('hint-active');
-        document.getElementById('hint-msg').innerText = "TAP 1 BLOCK TO REMOVE";
-        document.getElementById('hint-btn').style.display = 'none';
-    }
-
-    function handleMove(r, c) {
-        if(isHintMode) {
-            if(board[r][c]) {
-                board[r][c] = 0;
-                document.getElementById(`r${r}c${c}`).classList.remove('filled');
-                isHintMode = false;
-                document.getElementById('grid').classList.remove('hint-active');
-                document.getElementById('hint-msg').innerText = "";
-                document.getElementById('hint-btn').style.display = 'block';
-            }
-            return;
-        }
-        if(!selectedPiece) return;
-        const s = selectedPiece.data;
-        for(let i=0; i<s.length; i++) for(let j=0; j<s[i].length; j++)
-            if(s[i][j] && (r+i >= 8 || c+j >= 8 || board[r+i][c+j])) return;
-
-        for(let i=0; i<s.length; i++) for(let j=0; j<s[i].length; j++) if(s[i][j]) {
-            board[r+i][c+j] = 1;
-            document.getElementById(`r${r+i}c${c+j}`).classList.add('filled');
-        }
-        selectedPiece.el.remove();
-        selectedPiece = null;
-        check();
-        if(!document.getElementById('pieces-area').children.length) spawn();
+        showScreen('game-screen');
     }
 
     function spawn() {
         const area = document.getElementById('pieces-area');
+        area.innerHTML = '';
         for(let i=0; i<3; i++) {
             const data = shapes[Math.floor(Math.random()*shapes.length)];
             const container = document.createElement('div');
@@ -181,7 +177,37 @@
         }
     }
 
-    function check() {
+    function handleMove(r, c) {
+        if(isHintMode) {
+            if(board[r][c]) {
+                board[r][c] = 0;
+                document.getElementById(`r${r}c${c}`).classList.remove('filled');
+                isHintMode = false;
+                document.getElementById('hint-msg').innerText = "";
+                document.getElementById('hint-btn').style.display = 'block';
+            }
+            return;
+        }
+        if(!selectedPiece) return;
+        const s = selectedPiece.data;
+        for(let i=0; i<s.length; i++) for(let j=0; j<s[i].length; j++)
+            if(s[i][j] && (r+i >= 8 || c+j >= 8 || board[r+i][c+j])) return;
+
+        for(let i=0; i<s.length; i++) for(let j=0; j<s[i].length; j++) if(s[i][j]) {
+            board[r+i][c+j] = 1;
+            document.getElementById(`r${r+i}c${c+j}`).classList.add('filled');
+        }
+        selectedPiece.el.remove();
+        selectedPiece = null;
+        moves++;
+        checkBoard();
+        if(!document.getElementById('pieces-area').children.length) spawn();
+        
+        // Activate hint after 1st move
+        if(moves >= 1 && !cooldown) document.getElementById('hint-btn').disabled = false;
+    }
+
+    function checkBoard() {
         let rC = [], cC = [];
         for(let r=0; r<8; r++) if(board[r].every(v => v === 1)) rC.push(r);
         for(let c=0; c<8; c++) {
@@ -192,7 +218,40 @@
         rC.forEach(r => { for(let c=0; c<8; c++) { board[r][c]=0; document.getElementById(`r${r}c${c}`).classList.remove('filled'); } score+=50; });
         cC.forEach(c => { for(let r=0; r<8; r++) { board[r][c]=0; document.getElementById(`r${r}c${c}`).classList.remove('filled'); } score+=50; });
         document.getElementById('ui-score').innerText = score;
-        if(score >= target) { currentLvl++; localStorage.setItem('royal_lvl', currentLvl); alert("Level Up!"); location.reload(); }
+        if(score >= target) {
+            alert("LEVEL COMPLETE!");
+            if(currentLvl == unlocked) { unlocked++; localStorage.setItem('royal_unlocked', unlocked); }
+            showScreen('level-screen');
+        }
+    }
+
+    function useMagicHint() {
+        // Rotate Smart Links
+        const link = smartLinks[Math.floor(Math.random() * smartLinks.length)];
+        window.open(link, "_blank");
+
+        isHintMode = true;
+        document.getElementById('hint-msg').innerText = "TAP A BLOCK TO REMOVE";
+        document.getElementById('hint-btn').style.display = 'none';
+        
+        // Cooldown 1 minute
+        startCooldown(60);
+    }
+
+    function startCooldown(s) {
+        cooldown = true;
+        document.getElementById('hint-btn').disabled = true;
+        let t = s;
+        const intr = setInterval(() => {
+            t--;
+            document.getElementById('cooldown-txt').innerText = `Next hint in ${t}s`;
+            if(t <= 0) {
+                clearInterval(intr);
+                cooldown = false;
+                document.getElementById('cooldown-txt').innerText = "";
+                if(moves >= 1) document.getElementById('hint-btn').disabled = false;
+            }
+        }, 1000);
     }
 </script>
 </body>
