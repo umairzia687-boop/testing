@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Royal Puzzle Fix</title>
+    <script defer src="https://pl28980106.profitablecpmratenetwork.com/20/bd/f4/20bdf4fc49430a4adf6663e28963e137.js"></script>
+    <style>
+        :root { --wood: #8d6e63; --grid-bg: #3e2723; --accent: #feca57; --bg: #2d1b17; }
+        
+        /* Poori screen ko control karne ke liye */
+        html, body { height: 100%; margin: 0; padding: 0; background: var(--bg); color: white; font-family: sans-serif; overflow: hidden; }
+        
+        #game-wrapper { 
+            display: flex; 
+            flex-direction: column; 
+            height: 100vh; 
+            width: 100%; 
+            max-width: 450px; 
+            margin: 0 auto;
+        }
+
+        /* Ad Sections */
+        .ad-zone { width: 100%; height: 60px; display: flex; align-items: center; justify-content: center; background: #000; flex-shrink: 0; }
+
+        /* Main Game Area */
+        #main-content { 
+            flex-grow: 1; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center; 
+            padding: 10px;
+        }
+
+        #hud { display: flex; gap: 15px; margin-bottom: 10px; }
+        .stat-box { background: #000; border: 1.5px solid var(--accent); border-radius: 8px; padding: 5px 12px; text-align: center; }
+        .val { font-size: 1.1rem; font-weight: bold; color: var(--accent); display: block; }
+        .lbl { font-size: 10px; text-transform: uppercase; }
+
+        #grid { 
+            display: grid; 
+            grid-template-columns: repeat(8, 1fr); 
+            gap: 4px; 
+            background: var(--grid-bg); 
+            padding: 8px; 
+            border-radius: 10px; 
+            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+        }
+        .cell { width: 40px; height: 40px; background: rgba(255,255,255,0.05); border-radius: 4px; }
+        .cell.filled { background: var(--wood); border: 1px solid #a1887f; box-shadow: inset 0 0 5px #000; }
+
+        #pieces-area { margin-top: 20px; display: flex; gap: 10px; height: 70px; }
+        .piece-container { padding: 5px; border: 2px solid transparent; border-radius: 8px; background: rgba(255,255,255,0.03); cursor: pointer; }
+        .piece-container.selected { border-color: var(--accent); background: rgba(254, 202, 87, 0.2); }
+        .piece { display: grid; gap: 2px; }
+        .p-block { width: 15px; height: 15px; background: var(--wood); border-radius: 2px; }
+
+        #hint-btn { margin-top: 15px; background: var(--accent); color: #000; border: none; padding: 10px 20px; border-radius: 20px; font-weight: bold; cursor: pointer; }
+        #hint-msg { height: 20px; color: var(--accent); font-size: 13px; font-weight: bold; }
+
+        .hint-active .cell.filled { animation: shake 0.5s infinite; border-color: #fff; }
+        @keyframes shake { 0%, 100% { transform: scale(1); } 50% { transform: scale(0.95); } }
+    </style>
+</head>
+<body onload="init()">
+
+<div id="game-wrapper">
+    <div class="ad-zone">
+        <script type="text/javascript">
+            atOptions = { 'key' : 'e554307db5af71bb93a1bdbca30869f3', 'format' : 'iframe', 'height' : 50, 'width' : 320, 'params' : {} };
+        </script>
+        <script type="text/javascript" src="https://www.highperformanceformat.com/e554307db5af71bb93a1bdbca30869f3/invoke.js"></script>
+    </div>
+
+    <div id="main-content">
+        <div id="hud">
+            <div class="stat-box"><span class="lbl">Level</span><span id="ui-lvl" class="val">1</span></div>
+            <div class="stat-box"><span class="lbl">Score</span><span id="ui-score" class="val">0</span></div>
+            <div class="stat-box"><span class="lbl">Target</span><span id="ui-target" class="val">300</span></div>
+        </div>
+
+        <div id="hint-msg"></div>
+        <div id="grid"></div>
+        <div id="pieces-area"></div>
+
+        <button id="hint-btn" onclick="useHint()">✨ MAGIC HINT</button>
+    </div>
+
+    <div class="ad-zone">
+        <script type="text/javascript">
+            atOptions = { 'key' : 'e554307db5af71bb93a1bdbca30869f3', 'format' : 'iframe', 'height' : 50, 'width' : 320, 'params' : {} };
+        </script>
+        <script type="text/javascript" src="https://www.highperformanceformat.com/e554307db5af71bb93a1bdbca30869f3/invoke.js"></script>
+    </div>
+</div>
+
+<script>
+    let board = Array(8).fill().map(() => Array(8).fill(0));
+    let selectedPiece = null;
+    let score = 0;
+    let isHintMode = false;
+    let currentLvl = parseInt(localStorage.getItem('royal_lvl')) || 1;
+    let target = 300 + (currentLvl - 1) * 200;
+    const shapes = [[[1,1],[1,1]], [[1,1,1]], [[1,1,1,1]], [[1,1],[1,0]], [[1]], [[1,1,1],[0,1,0]]];
+
+    function init() {
+        document.getElementById('ui-lvl').innerText = currentLvl;
+        document.getElementById('ui-target').innerText = target;
+        const grid = document.getElementById('grid');
+        for(let r=0; r<8; r++) {
+            for(let c=0; c<8; c++) {
+                const cell = document.createElement('div');
+                cell.className = 'cell';
+                cell.id = `r${r}c${c}`;
+                cell.onclick = () => handleMove(r, c);
+                grid.appendChild(cell);
+            }
+        }
+        spawn();
+    }
+
+    function useHint() {
+        window.open("https://www.profitablecpmratenetwork.com/bm6t0hv6n?key=aa011a75a61b6cd284d3a64a702daf09", "_blank", "width=300,height=400");
+        isHintMode = true;
+        document.getElementById('grid').classList.add('hint-active');
+        document.getElementById('hint-msg').innerText = "TAP 1 BLOCK TO REMOVE";
+        document.getElementById('hint-btn').style.display = 'none';
+    }
+
+    function handleMove(r, c) {
+        if(isHintMode) {
+            if(board[r][c]) {
+                board[r][c] = 0;
+                document.getElementById(`r${r}c${c}`).classList.remove('filled');
+                isHintMode = false;
+                document.getElementById('grid').classList.remove('hint-active');
+                document.getElementById('hint-msg').innerText = "";
+                document.getElementById('hint-btn').style.display = 'block';
+            }
+            return;
+        }
+        if(!selectedPiece) return;
+        const s = selectedPiece.data;
+        for(let i=0; i<s.length; i++) for(let j=0; j<s[i].length; j++)
+            if(s[i][j] && (r+i >= 8 || c+j >= 8 || board[r+i][c+j])) return;
+
+        for(let i=0; i<s.length; i++) for(let j=0; j<s[i].length; j++) if(s[i][j]) {
+            board[r+i][c+j] = 1;
+            document.getElementById(`r${r+i}c${c+j}`).classList.add('filled');
+        }
+        selectedPiece.el.remove();
+        selectedPiece = null;
+        check();
+        if(!document.getElementById('pieces-area').children.length) spawn();
+    }
+
+    function spawn() {
+        const area = document.getElementById('pieces-area');
+        for(let i=0; i<3; i++) {
+            const data = shapes[Math.floor(Math.random()*shapes.length)];
+            const container = document.createElement('div');
+            container.className = 'piece-container';
+            container.onclick = (e) => {
+                document.querySelectorAll('.piece-container').forEach(p => p.classList.remove('selected'));
+                container.classList.add('selected');
+                selectedPiece = { data, el: container };
+                e.stopPropagation();
+            };
+            const p = document.createElement('div');
+            p.className = 'piece';
+            p.style.gridTemplateColumns = `repeat(${data[0].length}, 1fr)`;
+            data.forEach(row => row.forEach(v => {
+                const b = document.createElement('div');
+                if(v) b.className = 'p-block';
+                else b.style.visibility = 'hidden';
+                p.appendChild(b);
+            }));
+            container.appendChild(p);
+            area.appendChild(container);
+        }
+    }
+
+    function check() {
+        let rC = [], cC = [];
+        for(let r=0; r<8; r++) if(board[r].every(v => v === 1)) rC.push(r);
+        for(let c=0; c<8; c++) {
+            let f = true;
+            for(let r=0; r<8; r++) if(!board[r][c]) f = false;
+            if(f) cC.push(c);
+        }
+        rC.forEach(r => { for(let c=0; c<8; c++) { board[r][c]=0; document.getElementById(`r${r}c${c}`).classList.remove('filled'); } score+=50; });
+        cC.forEach(c => { for(let r=0; r<8; r++) { board[r][c]=0; document.getElementById(`r${r}c${c}`).classList.remove('filled'); } score+=50; });
+        document.getElementById('ui-score').innerText = score;
+        if(score >= target) { currentLvl++; localStorage.setItem('royal_lvl', currentLvl); alert("Level Up!"); location.reload(); }
+    }
+</script>
+</body>
+</html>
