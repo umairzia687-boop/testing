@@ -9,7 +9,6 @@
         :root { --wood: #8d6e63; --grid-bg: #3e2723; --accent: #feca57; --bg: #2d1b17; }
         html, body { height: 100%; margin: 0; padding: 0; background: var(--bg); color: white; font-family: sans-serif; overflow: hidden; touch-action: manipulation; }
         
-        /* Screens */
         .screen { position: fixed; inset: 0; display: none; flex-direction: column; align-items: center; justify-content: center; background: var(--bg); z-index: 20; }
         .active { display: flex !important; }
 
@@ -17,18 +16,15 @@
         .logo-anim { font-size: 3rem; font-weight: bold; color: var(--accent); animation: pulse 1.5s infinite; text-align: center; }
         @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
 
-        /* Level Grid */
         .level-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; padding: 20px; }
         .lvl-node { width: 55px; height: 55px; background: #000; border: 2px solid #444; display: flex; align-items: center; justify-content: center; border-radius: 10px; cursor: pointer; }
         .lvl-unlocked { border-color: var(--accent); color: var(--accent); font-weight: bold; }
 
-        /* Game Layout */
         #game-wrapper { display: flex; flex-direction: column; height: 100vh; width: 100%; max-width: 450px; margin: 0 auto; overflow: hidden; }
         .ad-zone { width: 100%; min-height: 60px; display: flex; align-items: center; justify-content: center; background: #000; flex-shrink: 0; }
         .ad-zone-large { width: 100%; min-height: 250px; display: flex; align-items: center; justify-content: center; background: #000; margin-top: auto; }
         
         #main-content { flex-grow: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 5px; }
-
         #hud { display: flex; gap: 10px; margin-bottom: 5px; }
         .stat-box { background: #000; border: 1.5px solid var(--accent); border-radius: 8px; padding: 4px 10px; text-align: center; min-width: 60px; }
         .val { font-size: 1rem; font-weight: bold; color: var(--accent); display: block; }
@@ -47,7 +43,6 @@
         .btn { background: var(--accent); color: #000; border: none; padding: 10px 25px; border-radius: 20px; font-weight: bold; cursor: pointer; width: 160px; text-align: center; }
         .btn:disabled { background: #555 !important; opacity: 0.6; }
         .rotate-btn { background: #4a69bd; color: white; }
-        
         .hidden-hint { visibility: hidden; pointer-events: none; }
     </style>
 </head>
@@ -72,8 +67,10 @@
     <div id="game-screen" class="screen">
         <div id="game-wrapper">
             <div class="ad-zone">
-                <script async="async" data-cfasync="false" src="https://pl28980107.profitablecpmratenetwork.com/bf6e696d81bb9d0cc3f9613ee1f4d10f/invoke.js"></script>
-                <div id="container-bf6e696d81bb9d0cc3f9613ee1f4d10f"></div>
+                <script type="text/javascript">
+                    atOptions = { 'key' : 'e554307db5af71bb93a1bdbca30869f3', 'format' : 'iframe', 'height' : 50, 'width' : 320, 'params' : {} };
+                </script>
+                <script src="https://www.highperformanceformat.com/e554307db5af71bb93a1bdbca30869f3/invoke.js"></script>
             </div>
 
             <div id="main-content">
@@ -115,20 +112,13 @@
     let selectedPiece = null, isHintMode = false, cooldown = false;
     const shapes = [[[1,1],[1,1]], [[1,1,1]], [[1,1,1,1]], [[1,1],[1,0]], [[1]], [[1,1,1],[0,1,0]]];
 
-    function initApp() {
-        // Auto-move after 2.5s if user doesn't click
-        setTimeout(goToStart, 2500);
-    }
-
-    function goToStart() {
-        showScreen('start-screen');
-    }
+    function initApp() { setTimeout(goToStart, 2000); }
+    function goToStart() { showScreen('start-screen'); }
 
     function showScreen(id) {
-        const screens = document.querySelectorAll('.screen');
-        screens.forEach(s => s.classList.remove('active'));
-        const activeScreen = document.getElementById(id);
-        if(activeScreen) activeScreen.classList.add('active');
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        const target = document.getElementById(id);
+        if(target) target.classList.add('active');
         if(id === 'level-screen') renderLevels();
     }
 
