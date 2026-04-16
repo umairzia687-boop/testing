@@ -5,106 +5,129 @@
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Royal Block Puzzle - New Ads</title>
+    <title>Royal Block Puzzle - Mobile Fixed</title>
     <style>
         :root { --wood: #8d6e63; --grid-bg: #3e2723; --accent: #feca57; --bg: #2d1b17; }
-        html, body { height: 100%; margin: 0; padding: 0; background: var(--bg); color: white; font-family: sans-serif; overflow: hidden; touch-action: manipulation; }
         
-        /* NAYE AD ZONE LAYOUT */
-        .ad-row { width: 100%; height: 50px; background: #000; display: flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0; }
-        .ad-top { border-bottom: 1px solid #444; }
-        .ad-bottom { border-top: 1px solid #444; }
+        /* FULL RESET - Taake koi cheez cut na ho */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { height: 100%; width: 100%; background: var(--bg); color: white; font-family: sans-serif; overflow: hidden; touch-action: manipulation; }
+        
+        /* AD CONTAINERS - Mobile optimized */
+        .ad-wrapper {
+            width: 100%;
+            height: 60px; /* 50px ad + 10px safe space */
+            background: #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0; /* Isse ad dabega nahi */
+            z-index: 100;
+        }
 
+        /* MAIN LAYOUT */
+        #game-wrapper {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            width: 100%;
+        }
+
+        #main-content {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 10px;
+            overflow: hidden;
+        }
+
+        /* SCREEN STYLES */
         .screen { position: fixed; inset: 0; display: none; flex-direction: column; align-items: center; justify-content: center; background: var(--bg); z-index: 20; }
         .active { display: flex !important; }
 
-        #intro-screen { background: radial-gradient(circle, #4e342e, #1a1a1a); z-index: 1000; cursor: pointer; }
-        .logo-anim { font-size: 3rem; font-weight: bold; color: var(--accent); animation: pulse 1.5s infinite; text-align: center; }
+        /* LOGO & LEVELS */
+        .logo-anim { font-size: 2.5rem; font-weight: bold; color: var(--accent); animation: pulse 1.5s infinite; text-align: center; }
         @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
-
         .level-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; padding: 20px; }
-        .lvl-node { width: 55px; height: 55px; background: #000; border: 2px solid #444; display: flex; align-items: center; justify-content: center; border-radius: 10px; cursor: pointer; }
+        .lvl-node { width: 50px; height: 50px; background: #000; border: 2px solid #444; display: flex; align-items: center; justify-content: center; border-radius: 10px; }
         .lvl-unlocked { border-color: var(--accent); color: var(--accent); font-weight: bold; }
 
-        #game-wrapper { display: flex; flex-direction: column; height: 100vh; width: 100%; max-width: 450px; margin: 0 auto; overflow: hidden; }
-        #main-content { flex-grow: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 10px; }
-        
-        #hud { display: flex; gap: 10px; margin-bottom: 10px; }
-        .stat-box { background: #000; border: 1.5px solid var(--accent); border-radius: 8px; padding: 4px 10px; text-align: center; min-width: 70px; }
-        .val { font-size: 1.1rem; font-weight: bold; color: var(--accent); display: block; }
+        /* GRID SYSTEM - Mobile Responsive */
+        #hud { display: flex; gap: 8px; margin-bottom: 10px; }
+        .stat-box { background: #000; border: 1.5px solid var(--accent); border-radius: 8px; padding: 4px 8px; text-align: center; min-width: 65px; }
+        .val { font-size: 1rem; font-weight: bold; color: var(--accent); }
 
-        #grid { display: grid; grid-template-columns: repeat(8, 1fr); gap: 4px; background: var(--grid-bg); padding: 8px; border-radius: 8px; }
-        .cell { width: 38px; height: 38px; background: rgba(255,255,255,0.05); border-radius: 4px; }
-        .cell.filled { background: var(--wood); border: 1px solid #a1887f; box-shadow: inset 0 0 5px rgba(0,0,0,0.5); }
+        #grid { display: grid; grid-template-columns: repeat(8, 1fr); gap: 3px; background: var(--grid-bg); padding: 6px; border-radius: 8px; }
+        .cell { width: 35px; height: 35px; background: rgba(255,255,255,0.05); border-radius: 4px; }
+        .cell.filled { background: var(--wood); border: 1px solid #a1887f; }
 
-        #pieces-area { margin-top: 15px; display: flex; gap: 12px; height: 75px; align-items: center; }
-        .piece-container { padding: 6px; border: 2px solid transparent; border-radius: 8px; background: rgba(255,255,255,0.03); cursor: pointer; }
+        #pieces-area { margin-top: 10px; display: flex; gap: 10px; height: 70px; align-items: center; }
+        .piece-container { padding: 5px; border: 2px solid transparent; border-radius: 8px; background: rgba(255,255,255,0.03); }
         .piece-container.selected { border-color: var(--accent); background: rgba(254, 202, 87, 0.2); }
-        .piece { display: grid; gap: 2px; }
-        .p-block { width: 15px; height: 15px; background: var(--wood); border-radius: 2px; }
+        .p-block { width: 14px; height: 14px; background: var(--wood); border-radius: 2px; }
 
-        .btn-group { display: flex; gap: 12px; margin-top: 15px; }
-        .btn { background: var(--accent); color: #000; border: none; padding: 10px 20px; border-radius: 20px; font-weight: bold; cursor: pointer; min-width: 130px; text-align: center; }
-        .btn-rotate { background: #4a69bd; color: white; }
-        .btn-disabled { opacity: 0.5; pointer-events: none; filter: grayscale(1); }
+        .btn-group { display: flex; gap: 10px; margin-top: 15px; }
+        .btn { background: var(--accent); color: #000; border: none; padding: 10px 15px; border-radius: 20px; font-weight: bold; cursor: pointer; min-width: 120px; }
+        .btn-disabled { opacity: 0.5; pointer-events: none; }
     </style>
 </head>
 <body onload="initApp()">
 
-    <div class="ad-row ad-top">
+<div id="game-wrapper">
+    <div class="ad-wrapper">
         <script type="text/javascript">
             atOptions = { 'key' : '4eafdafc033a151a2e0af11439bc6d7c', 'format' : 'iframe', 'height' : 50, 'width' : 320, 'params' : {} };
         </script>
         <script type="text/javascript" src="https://www.highperformanceformat.com/4eafdafc033a151a2e0af11439bc6d7c/invoke.js"></script>
     </div>
 
-    <div id="intro-screen" class="screen active" onclick="goToStart()">
-        <div class="logo-anim">ROYAL BLOCKS</div>
-        <p style="margin-top:20px; font-size: 14px; opacity: 0.7;">TAP TO START</p>
-    </div>
-
-    <div id="start-screen" class="screen">
-        <h1 style="color:var(--accent); margin-bottom: 20px;">PUZZLE KING</h1>
-        <button class="btn" onclick="showScreen('level-screen')">PLAY NOW</button>
-    </div>
-
-    <div id="level-screen" class="screen">
-        <h3>CHOOSE LEVEL</h3>
-        <div class="level-grid" id="level-list"></div>
-        <button class="btn" style="margin-top:15px;" onclick="showScreen('start-screen')">BACK</button>
-    </div>
-
-    <div id="game-screen" class="screen">
-        <div id="game-wrapper">
-            <div id="main-content">
-                <div id="hud">
-                    <div class="stat-box"><small>LVL</small><span id="ui-lvl" class="val">1</span></div>
-                    <div class="stat-box"><small>SCORE</small><span id="ui-score" class="val">0</span></div>
-                    <div class="stat-box"><small>GOAL</small><span id="ui-target" class="val">300</span></div>
-                </div>
-                <div id="grid"></div>
-                <div id="pieces-area"></div>
-                
-                <div class="btn-group">
-                    <button class="btn btn-rotate" onclick="rotatePiece()">🔄 ROTATE</button>
-                    <button id="hint-btn" class="btn" onclick="useHint()">✨ MAGIC HINT</button>
-                </div>
-                <div id="cooldown-txt" style="font-size:11px; color:var(--accent); margin-top:8px; height:12px; font-weight: bold;"></div>
-            </div>
+    <main id="main-content">
+        <div id="intro-screen" class="screen active" onclick="goToStart()">
+            <div class="logo-anim">ROYAL BLOCKS</div>
+            <p style="margin-top:20px; opacity: 0.7;">TAP TO START</p>
         </div>
-    </div>
 
-    <div class="ad-row ad-bottom">
+        <div id="start-screen" class="screen">
+            <h1 style="color:var(--accent); margin-bottom: 20px;">PUZZLE KING</h1>
+            <button class="btn" onclick="showScreen('level-screen')">START GAME</button>
+        </div>
+
+        <div id="level-screen" class="screen">
+            <h3>LEVELS</h3>
+            <div class="level-grid" id="level-list"></div>
+            <button class="btn" onclick="showScreen('start-screen')">BACK</button>
+        </div>
+
+        <div id="game-play" style="display:none; flex-direction:column; align-items:center;">
+            <div id="hud">
+                <div class="stat-box"><small>LVL</small><span id="ui-lvl" class="val">1</span></div>
+                <div class="stat-box"><small>SCORE</small><span id="ui-score" class="val">0</span></div>
+                <div class="stat-box"><small>GOAL</small><span id="ui-target" class="val">300</span></div>
+            </div>
+            <div id="grid"></div>
+            <div id="pieces-area"></div>
+            <div class="btn-group">
+                <button class="btn" style="background:#4a69bd; color:white;" onclick="rotatePiece()">🔄 ROTATE</button>
+                <button id="hint-btn" class="btn" onclick="useHint()">✨ MAGIC HINT</button>
+            </div>
+            <div id="cooldown-txt" style="font-size:11px; color:var(--accent); margin-top:8px; height:12px;"></div>
+        </div>
+    </main>
+
+    <div class="ad-wrapper">
         <script type="text/javascript">
             atOptions = { 'key' : '4eafdafc033a151a2e0af11439bc6d7c', 'format' : 'iframe', 'height' : 50, 'width' : 320, 'params' : {} };
         </script>
         <script type="text/javascript" src="https://www.highperformanceformat.com/4eafdafc033a151a2e0af11439bc6d7c/invoke.js"></script>
     </div>
+</div>
 
 <script>
-    let unlocked = parseInt(localStorage.getItem('royal_unlocked_earn')) || 1;
+    let unlocked = parseInt(localStorage.getItem('royal_unlocked_final')) || 1;
     let board = Array(8).fill().map(() => Array(8).fill(0));
-    let score = 0, currentLvl = 1, target = 300, moves = 0, canHint = true;
+    let score = 0, currentLvl = 1, target = 300, canHint = true;
     let selectedPiece = null;
     const shapes = [[[1,1],[1,1]], [[1,1,1]], [[1,1,1,1]], [[1,1],[1,0]], [[1]], [[1,1,1],[0,1,0]]];
 
@@ -113,8 +136,14 @@
 
     function showScreen(id) {
         document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-        const el = document.getElementById(id);
-        if(el) el.classList.add('active');
+        document.getElementById('game-play').style.display = 'none';
+        
+        if (id === 'game-play') {
+            document.getElementById('game-play').style.display = 'flex';
+        } else {
+            const el = document.getElementById(id);
+            if(el) el.classList.add('active');
+        }
         if(id === 'level-screen') renderLevels();
     }
 
@@ -131,10 +160,8 @@
     }
 
     function setupLevel(lvl) {
-        if(lvl) currentLvl = lvl;
-        target = 300 + (currentLvl - 1) * 200; 
-        score = 0; moves = 0;
-        document.getElementById('ui-lvl').innerText = currentLvl;
+        currentLvl = lvl; target = 300 + (lvl - 1) * 200; score = 0;
+        document.getElementById('ui-lvl').innerText = lvl;
         document.getElementById('ui-target').innerText = target;
         document.getElementById('ui-score').innerText = "0";
         board = Array(8).fill().map(() => Array(8).fill(0));
@@ -148,7 +175,7 @@
                 gridEl.appendChild(cell);
             }
         }
-        spawn(); showScreen('game-screen');
+        spawn(); showScreen('game-play');
     }
 
     function spawn() {
@@ -166,7 +193,9 @@
             };
             const p = document.createElement('div');
             p.className = 'piece';
+            p.style.display = 'grid';
             p.style.gridTemplateColumns = `repeat(${data[0].length}, 1fr)`;
+            p.style.gap = '2px';
             data.forEach(row => row.forEach(v => {
                 const b = document.createElement('div');
                 if(v) b.className = 'p-block'; else b.style.visibility = 'hidden';
@@ -200,7 +229,7 @@
         for(let i=0; i<s.length; i++) for(let j=0; j<s[i].length; j++) if(s[i][j]) {
             board[r+i][c+j] = 1; document.getElementById(`r${r+i}c${c+j}`).classList.add('filled');
         }
-        selectedPiece.el.remove(); selectedPiece = null; moves++; checkBoard();
+        selectedPiece.el.remove(); selectedPiece = null; checkBoard();
         if(!document.getElementById('pieces-area').children.length) spawn();
     }
 
@@ -217,29 +246,19 @@
         document.getElementById('ui-score').innerText = score;
         if(score >= target) {
             alert("LEVEL COMPLETE!");
-            if(currentLvl == unlocked) { unlocked++; localStorage.setItem('royal_unlocked_earn', unlocked); }
+            if(currentLvl == unlocked) { unlocked++; localStorage.setItem('royal_unlocked_final', unlocked); }
             showScreen('level-screen');
         }
     }
 
-    // --- NAYA SMARTLINK HINT (ygqvt003ga...) ---
     function useHint() {
         if(!canHint) return;
+        window.open("https://www.profitablecpmratenetwork.com/ygqvt003ga?key=f341f8a112ff7396caffd005f9f0b2e0", "_blank");
         
-        // Open Naya Smartlink
-        const smartLink = "https://www.profitablecpmratenetwork.com/ygqvt003ga?key=f341f8a112ff7396caffd005f9f0b2e0";
-        window.open(smartLink, "_blank");
-
-        // Game Effect
         let randomRow = Math.floor(Math.random() * 8);
-        for(let c=0; c<8; c++) {
-            board[randomRow][c] = 0;
-            document.getElementById(`r${randomRow}c${c}`).classList.remove('filled');
-        }
-        score += 20;
-        document.getElementById('ui-score').innerText = score;
+        for(let c=0; c<8; c++) { board[randomRow][c] = 0; document.getElementById(`r${randomRow}c${c}`).classList.remove('filled'); }
+        score += 20; document.getElementById('ui-score').innerText = score;
 
-        // Cooldown 15s
         canHint = false;
         let timeLeft = 15;
         const btn = document.getElementById('hint-btn');
@@ -247,12 +266,7 @@
         const timer = setInterval(() => {
             timeLeft--;
             document.getElementById('cooldown-txt').innerText = `NEXT HINT IN ${timeLeft}s`;
-            if(timeLeft <= 0) {
-                clearInterval(timer);
-                canHint = true;
-                btn.classList.remove('btn-disabled');
-                document.getElementById('cooldown-txt').innerText = "";
-            }
+            if(timeLeft <= 0) { clearInterval(timer); canHint = true; btn.classList.remove('btn-disabled'); document.getElementById('cooldown-txt').innerText = ""; }
         }, 1000);
     }
 </script>
