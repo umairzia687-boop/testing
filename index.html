@@ -4,18 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Royal Block Puzzle</title>
-    <script defer src="https://pl28980106.profitablecpmratenetwork.com/20/bd/f4/20bdf4fc49430a4adf6663e28963e137.js"></script>
+    <script src="https://pl28980106.profitablecpmratenetwork.com/20/bd/f4/20bdf4fc49430a4adf6663e28963e137.js"></script>
     <style>
         :root { --wood: #8d6e63; --grid-bg: #3e2723; --accent: #feca57; --bg: #2d1b17; }
-        html, body { height: 100%; margin: 0; padding: 0; background: var(--bg); color: white; font-family: sans-serif; overflow: hidden; }
+        html, body { height: 100%; margin: 0; padding: 0; background: var(--bg); color: white; font-family: sans-serif; overflow: hidden; touch-action: manipulation; }
         
         /* Screens */
         .screen { position: fixed; inset: 0; display: none; flex-direction: column; align-items: center; justify-content: center; background: var(--bg); z-index: 20; }
-        .active { display: flex; }
+        .active { display: flex !important; }
 
-        #intro-screen { background: radial-gradient(circle, #4e342e, #1a1a1a); z-index: 100; }
-        .logo-anim { font-size: 3rem; font-weight: bold; color: var(--accent); animation: pulse 1.5s infinite; }
-        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
+        #intro-screen { background: radial-gradient(circle, #4e342e, #1a1a1a); z-index: 1000; cursor: pointer; }
+        .logo-anim { font-size: 3rem; font-weight: bold; color: var(--accent); animation: pulse 1.5s infinite; text-align: center; }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
 
         /* Level Grid */
         .level-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; padding: 20px; }
@@ -23,37 +23,39 @@
         .lvl-unlocked { border-color: var(--accent); color: var(--accent); font-weight: bold; }
 
         /* Game Layout */
-        #game-wrapper { display: flex; flex-direction: column; height: 100vh; width: 100%; max-width: 450px; margin: 0 auto; }
-        .ad-zone { width: 100%; height: 60px; display: flex; align-items: center; justify-content: center; background: #000; flex-shrink: 0; }
-        #main-content { flex-grow: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 10px; }
+        #game-wrapper { display: flex; flex-direction: column; height: 100vh; width: 100%; max-width: 450px; margin: 0 auto; overflow: hidden; }
+        .ad-zone { width: 100%; min-height: 60px; display: flex; align-items: center; justify-content: center; background: #000; flex-shrink: 0; }
+        .ad-zone-large { width: 100%; min-height: 250px; display: flex; align-items: center; justify-content: center; background: #000; margin-top: auto; }
+        
+        #main-content { flex-grow: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 5px; }
 
-        #hud { display: flex; gap: 15px; margin-bottom: 10px; }
-        .stat-box { background: #000; border: 1.5px solid var(--accent); border-radius: 8px; padding: 5px 12px; text-align: center; }
-        .val { font-size: 1.1rem; font-weight: bold; color: var(--accent); display: block; }
+        #hud { display: flex; gap: 10px; margin-bottom: 5px; }
+        .stat-box { background: #000; border: 1.5px solid var(--accent); border-radius: 8px; padding: 4px 10px; text-align: center; min-width: 60px; }
+        .val { font-size: 1rem; font-weight: bold; color: var(--accent); display: block; }
 
-        #grid { display: grid; grid-template-columns: repeat(8, 1fr); gap: 4px; background: var(--grid-bg); padding: 8px; border-radius: 10px; }
-        .cell { width: 40px; height: 40px; background: rgba(255,255,255,0.05); border-radius: 4px; }
-        .cell.filled { background: var(--wood); border: 1px solid #a1887f; }
+        #grid { display: grid; grid-template-columns: repeat(8, 1fr); gap: 3px; background: var(--grid-bg); padding: 6px; border-radius: 8px; }
+        .cell { width: 38px; height: 38px; background: rgba(255,255,255,0.05); border-radius: 4px; }
+        .cell.filled { background: var(--wood); border: 1px solid #a1887f; box-shadow: inset 0 0 5px rgba(0,0,0,0.5); }
 
-        #pieces-area { margin-top: 20px; display: flex; gap: 10px; height: 75px; }
+        #pieces-area { margin-top: 15px; display: flex; gap: 8px; height: 70px; align-items: center; }
         .piece-container { padding: 5px; border: 2px solid transparent; border-radius: 8px; background: rgba(255,255,255,0.03); cursor: pointer; }
         .piece-container.selected { border-color: var(--accent); background: rgba(254, 202, 87, 0.2); }
         .piece { display: grid; gap: 2px; }
-        .p-block { width: 15px; height: 15px; background: var(--wood); border-radius: 2px; }
+        .p-block { width: 14px; height: 14px; background: var(--wood); border-radius: 2px; }
 
-        .btn { background: var(--accent); color: #000; border: none; padding: 10px 25px; border-radius: 20px; font-weight: bold; cursor: pointer; }
-        .btn:disabled { background: #555; cursor: not-allowed; opacity: 0.7; }
+        .controls-row { display: flex; flex-direction: column; align-items: center; gap: 8px; margin-top: 10px; width: 100%; }
+        .btn { background: var(--accent); color: #000; border: none; padding: 10px 25px; border-radius: 20px; font-weight: bold; cursor: pointer; width: 160px; text-align: center; }
+        .btn:disabled { background: #555 !important; opacity: 0.6; }
+        .rotate-btn { background: #4a69bd; color: white; }
         
-        /* Sidebar Ad for Desktop */
-        @media (min-width: 800px) {
-            .side-ad { position: fixed; right: 20px; top: 50%; transform: translateY(-50%); width: 160px; }
-        }
+        .hidden-hint { visibility: hidden; pointer-events: none; }
     </style>
 </head>
 <body onload="initApp()">
 
-    <div id="intro-screen" class="screen active">
+    <div id="intro-screen" class="screen active" onclick="goToStart()">
         <div class="logo-anim">ROYAL BLOCKS</div>
+        <p style="margin-top:20px; font-size: 12px; opacity: 0.7;">TAP TO PLAY</p>
     </div>
 
     <div id="start-screen" class="screen">
@@ -64,29 +66,38 @@
     <div id="level-screen" class="screen">
         <h3>CHOOSE LEVEL</h3>
         <div class="level-grid" id="level-list"></div>
-        <button class="btn" style="font-size: 11px;" onclick="showScreen('start-screen')">BACK</button>
+        <button class="btn" style="font-size: 11px; width: 80px;" onclick="showScreen('start-screen')">BACK</button>
     </div>
 
     <div id="game-screen" class="screen">
         <div id="game-wrapper">
             <div class="ad-zone">
-                <script type="text/javascript">
-                    atOptions = { 'key' : 'e554307db5af71bb93a1bdbca30869f3', 'format' : 'iframe', 'height' : 50, 'width' : 320, 'params' : {} };
-                </script>
-                <script src="https://www.highperformanceformat.com/e554307db5af71bb93a1bdbca30869f3/invoke.js"></script>
+                <script async="async" data-cfasync="false" src="https://pl28980107.profitablecpmratenetwork.com/bf6e696d81bb9d0cc3f9613ee1f4d10f/invoke.js"></script>
+                <div id="container-bf6e696d81bb9d0cc3f9613ee1f4d10f"></div>
             </div>
 
             <div id="main-content">
                 <div id="hud">
-                    <div class="stat-box"><span id="ui-lvl" class="val">1</span></div>
-                    <div class="stat-box"><span id="ui-score" class="val">0</span></div>
-                    <div class="stat-box"><span id="ui-target" class="val">300</span></div>
+                    <div class="stat-box"><small>LVL</small><span id="ui-lvl" class="val">1</span></div>
+                    <div class="stat-box"><small>SCORE</small><span id="ui-score" class="val">0</span></div>
+                    <div class="stat-box"><small>GOAL</small><span id="ui-target" class="val">300</span></div>
                 </div>
-                <div id="hint-msg" style="height:20px; color:var(--accent); font-size:12px;"></div>
+                <div id="hint-msg" style="height:15px; color:var(--accent); font-size:11px;"></div>
                 <div id="grid"></div>
                 <div id="pieces-area"></div>
-                <button id="hint-btn" class="btn" onclick="useMagicHint()" disabled style="margin-top:15px;">✨ MAGIC HINT</button>
-                <div id="cooldown-txt" style="font-size:10px; color:#ff7675; margin-top:5px;"></div>
+                
+                <div class="controls-row">
+                    <button class="btn rotate-btn" onclick="rotatePiece()">🔄 ROTATE</button>
+                    <button id="hint-btn" class="btn" onclick="useMagicHint()" disabled>✨ MAGIC HINT</button>
+                </div>
+                <div id="cooldown-txt" style="font-size:10px; color:#ff7675; margin-top:5px; height: 12px;"></div>
+            </div>
+
+            <div class="ad-zone-large">
+                <script>
+                  atOptions = { 'key' : '69a03ea2751507f1217b12588de19019', 'format' : 'iframe', 'height' : 250, 'width' : 300, 'params' : {} };
+                </script>
+                <script src="https://www.highperformanceformat.com/69a03ea2751507f1217b12588de19019/invoke.js"></script>
             </div>
         </div>
     </div>
@@ -105,12 +116,19 @@
     const shapes = [[[1,1],[1,1]], [[1,1,1]], [[1,1,1,1]], [[1,1],[1,0]], [[1]], [[1,1,1],[0,1,0]]];
 
     function initApp() {
-        setTimeout(() => showScreen('start-screen'), 2500);
+        // Auto-move after 2.5s if user doesn't click
+        setTimeout(goToStart, 2500);
+    }
+
+    function goToStart() {
+        showScreen('start-screen');
     }
 
     function showScreen(id) {
-        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-        document.getElementById(id).classList.add('active');
+        const screens = document.querySelectorAll('.screen');
+        screens.forEach(s => s.classList.remove('active'));
+        const activeScreen = document.getElementById(id);
+        if(activeScreen) activeScreen.classList.add('active');
         if(id === 'level-screen') renderLevels();
     }
 
@@ -127,27 +145,22 @@
     }
 
     function startLevel(lvl) {
-        currentLvl = lvl;
-        target = 300 + (lvl - 1) * 200;
-        score = 0; moves = 0;
+        currentLvl = lvl; target = 300 + (lvl - 1) * 200; score = 0; moves = 0;
         document.getElementById('ui-lvl').innerText = lvl;
         document.getElementById('ui-target').innerText = target;
         document.getElementById('ui-score').innerText = "0";
         board = Array(8).fill().map(() => Array(8).fill(0));
-        
         const gridEl = document.getElementById('grid');
         gridEl.innerHTML = '';
         for(let r=0; r<8; r++) {
             for(let c=0; c<8; c++) {
                 const cell = document.createElement('div');
-                cell.className = 'cell';
-                cell.id = `r${r}c${c}`;
+                cell.className = 'cell'; cell.id = `r${r}c${c}`;
                 cell.onclick = () => handleMove(r, c);
                 gridEl.appendChild(cell);
             }
         }
-        spawn();
-        showScreen('game-screen');
+        spawn(); showScreen('game-screen');
     }
 
     function spawn() {
@@ -168,13 +181,26 @@
             p.style.gridTemplateColumns = `repeat(${data[0].length}, 1fr)`;
             data.forEach(row => row.forEach(v => {
                 const b = document.createElement('div');
-                if(v) b.className = 'p-block';
-                else b.style.visibility = 'hidden';
+                if(v) b.className = 'p-block'; else b.style.visibility = 'hidden';
                 p.appendChild(b);
             }));
-            container.appendChild(p);
-            area.appendChild(container);
+            container.appendChild(p); area.appendChild(container);
         }
+    }
+
+    function rotatePiece() {
+        if(!selectedPiece) return;
+        const matrix = selectedPiece.data;
+        const rotated = matrix[0].map((val, index) => matrix.map(row => row[index]).reverse());
+        selectedPiece.data = rotated;
+        const p = selectedPiece.el.querySelector('.piece');
+        p.innerHTML = '';
+        p.style.gridTemplateColumns = `repeat(${rotated[0].length}, 1fr)`;
+        rotated.forEach(row => row.forEach(v => {
+            const b = document.createElement('div');
+            if(v) b.className = 'p-block'; else b.style.visibility = 'hidden';
+            p.appendChild(b);
+        }));
     }
 
     function handleMove(r, c) {
@@ -184,7 +210,7 @@
                 document.getElementById(`r${r}c${c}`).classList.remove('filled');
                 isHintMode = false;
                 document.getElementById('hint-msg').innerText = "";
-                document.getElementById('hint-btn').style.display = 'block';
+                document.getElementById('hint-btn').classList.remove('hidden-hint');
             }
             return;
         }
@@ -194,16 +220,10 @@
             if(s[i][j] && (r+i >= 8 || c+j >= 8 || board[r+i][c+j])) return;
 
         for(let i=0; i<s.length; i++) for(let j=0; j<s[i].length; j++) if(s[i][j]) {
-            board[r+i][c+j] = 1;
-            document.getElementById(`r${r+i}c${c+j}`).classList.add('filled');
+            board[r+i][c+j] = 1; document.getElementById(`r${r+i}c${c+j}`).classList.add('filled');
         }
-        selectedPiece.el.remove();
-        selectedPiece = null;
-        moves++;
-        checkBoard();
+        selectedPiece.el.remove(); selectedPiece = null; moves++; checkBoard();
         if(!document.getElementById('pieces-area').children.length) spawn();
-        
-        // Activate hint after 1st move
         if(moves >= 1 && !cooldown) document.getElementById('hint-btn').disabled = false;
     }
 
@@ -226,15 +246,11 @@
     }
 
     function useMagicHint() {
-        // Rotate Smart Links
         const link = smartLinks[Math.floor(Math.random() * smartLinks.length)];
         window.open(link, "_blank");
-
         isHintMode = true;
         document.getElementById('hint-msg').innerText = "TAP A BLOCK TO REMOVE";
-        document.getElementById('hint-btn').style.display = 'none';
-        
-        // Cooldown 1 minute
+        document.getElementById('hint-btn').classList.add('hidden-hint');
         startCooldown(60);
     }
 
@@ -246,10 +262,12 @@
             t--;
             document.getElementById('cooldown-txt').innerText = `Next hint in ${t}s`;
             if(t <= 0) {
-                clearInterval(intr);
-                cooldown = false;
+                clearInterval(intr); cooldown = false;
                 document.getElementById('cooldown-txt').innerText = "";
-                if(moves >= 1) document.getElementById('hint-btn').disabled = false;
+                if(moves >= 1) {
+                    document.getElementById('hint-btn').disabled = false;
+                    document.getElementById('hint-btn').classList.remove('hidden-hint');
+                }
             }
         }, 1000);
     }
