@@ -5,12 +5,12 @@
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Royal Block Puzzle - Earning Mode</title>
+    <title>Royal Block Puzzle - New Ads</title>
     <style>
-        :root { --wood: #8d6e63; --grid-bg: #3e2723; --accent: #feca57; --bg: #2d1b17; --btn-hover: #ffd32a; }
+        :root { --wood: #8d6e63; --grid-bg: #3e2723; --accent: #feca57; --bg: #2d1b17; }
         html, body { height: 100%; margin: 0; padding: 0; background: var(--bg); color: white; font-family: sans-serif; overflow: hidden; touch-action: manipulation; }
         
-        /* AD ZONES */
+        /* NAYE AD ZONE LAYOUT */
         .ad-row { width: 100%; height: 50px; background: #000; display: flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0; }
         .ad-top { border-bottom: 1px solid #444; }
         .ad-bottom { border-top: 1px solid #444; }
@@ -27,8 +27,8 @@
         .lvl-unlocked { border-color: var(--accent); color: var(--accent); font-weight: bold; }
 
         #game-wrapper { display: flex; flex-direction: column; height: 100vh; width: 100%; max-width: 450px; margin: 0 auto; overflow: hidden; }
-        
         #main-content { flex-grow: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 10px; }
+        
         #hud { display: flex; gap: 10px; margin-bottom: 10px; }
         .stat-box { background: #000; border: 1.5px solid var(--accent); border-radius: 8px; padding: 4px 10px; text-align: center; min-width: 70px; }
         .val { font-size: 1.1rem; font-weight: bold; color: var(--accent); display: block; }
@@ -89,7 +89,7 @@
                     <button class="btn btn-rotate" onclick="rotatePiece()">🔄 ROTATE</button>
                     <button id="hint-btn" class="btn" onclick="useHint()">✨ MAGIC HINT</button>
                 </div>
-                <div id="cooldown-txt" style="font-size:11px; color:var(--accent); margin-top:8px; height:12px;"></div>
+                <div id="cooldown-txt" style="font-size:11px; color:var(--accent); margin-top:8px; height:12px; font-weight: bold;"></div>
             </div>
         </div>
     </div>
@@ -214,7 +214,6 @@
         }
         rC.forEach(r => { for(let c=0; c<8; c++) { board[r][c]=0; document.getElementById(`r${r}c${c}`).classList.remove('filled'); } score+=50; });
         cC.forEach(c => { for(let r=0; r<8; r++) { board[r][c]=0; document.getElementById(`r${r}c${c}`).classList.remove('filled'); } score+=50; });
-        
         document.getElementById('ui-score').innerText = score;
         if(score >= target) {
             alert("LEVEL COMPLETE!");
@@ -223,31 +222,31 @@
         }
     }
 
-    // --- SMARTLINK HINT LOGIC ---
+    // --- NAYA SMARTLINK HINT (ygqvt003ga...) ---
     function useHint() {
         if(!canHint) return;
         
-        // Smartlink Trigger
-        const link = "https://www.profitablecpmratenetwork.com/ygqvt003ga?key=f341f8a112ff7396caffd005f9f0b2e0";
-        window.open(link, "_blank");
+        // Open Naya Smartlink
+        const smartLink = "https://www.profitablecpmratenetwork.com/ygqvt003ga?key=f341f8a112ff7396caffd005f9f0b2e0";
+        window.open(smartLink, "_blank");
 
-        // Magic Effect: Clear 1 random row to help player
+        // Game Effect
         let randomRow = Math.floor(Math.random() * 8);
         for(let c=0; c<8; c++) {
             board[randomRow][c] = 0;
             document.getElementById(`r${randomRow}c${c}`).classList.remove('filled');
         }
-        score += 10;
+        score += 20;
         document.getElementById('ui-score').innerText = score;
 
-        // Cooldown
+        // Cooldown 15s
         canHint = false;
         let timeLeft = 15;
         const btn = document.getElementById('hint-btn');
         btn.classList.add('btn-disabled');
         const timer = setInterval(() => {
             timeLeft--;
-            document.getElementById('cooldown-txt').innerText = `Next Hint in ${timeLeft}s`;
+            document.getElementById('cooldown-txt').innerText = `NEXT HINT IN ${timeLeft}s`;
             if(timeLeft <= 0) {
                 clearInterval(timer);
                 canHint = true;
